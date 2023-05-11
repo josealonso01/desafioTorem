@@ -3,18 +3,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSmile, faPaperPlane } from '@fortawesome/free-regular-svg-icons';
 import { IoMdSettings } from 'react-icons/io';
 import { HiPhoneMissedCall } from 'react-icons/hi';
-
 import empty from '../assets/images/empty.png';
 import MyProfile from '../components/MyProfile';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { getUser } from '../redux/userSlice';
-import { Chat, LogoType } from '../types/chat';
+import { getUser, setUserData } from '../redux/userSlice';
+import { Chat, ChatTabProps, LogoType } from '../types/chat';
 import { getChats, setIsAllowedExpand } from '../redux/chatsSlice';
 import ChatHeader from '../components/HomeChat/ChatHeader';
 import ConfigDropdown from '../layout/Dropdowns/Config';
 import SearchBar from '../components/SearchBar';
 import ChatTab from '../components/HomeChat/ChatTab';
 import ChatMessages from '../components/HomeChat/ChatMessages';
+import axios from 'axios';
+import { setChatsData } from '../redux/chatsSlice';
+
+let ENDPOINT_USER = 'http://localhost:8080/users';
 
 function HomeChat() {
   const chatHeaderInitialState: Chat = {
@@ -32,21 +35,68 @@ function HomeChat() {
   const ref = useRef<any>();
 
   const chats = useAppSelector(getChats);
+
   const dispatch = useAppDispatch();
 
   const userData = useAppSelector(getUser);
+
+  const token = userData.authToken;
 
   const positionRef = useRef<any>();
 
   const logo = empty as unknown as LogoType;
 
   useEffect(() => {
-    /* 
-      TODO: 
-      1. Get user data 
-      2. Get chats data
-    */
-  }, []);
+    const fetchUserData = async () => {
+      const authToken = token;
+      try {
+        const response = await axios.get(ENDPOINT_USER, {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        });
+        dispatch(
+          setUserData({
+            name: response.data.name,
+            lastName: response.data.lastName,
+            email: response.data.email,
+            photo: response.data.photol,
+            userId: response.data.userId
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUserData();
+
+    const fetchUserChats = async () => {
+      const authToken = token;
+      try {
+        const response = await axios.get(ENDPOINT_USER, {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        });
+        console.log(response.data.chats);
+
+        const chatTabs: ChatTabProps[] = response.data.chats.map((chat: any) => {
+          return {
+            name: chat.name,
+            image: chat.image,
+            chatId: chat.chatId,
+            messages: chat.messages,
+            userData: chat.userData,
+            selectedChat: chat.selectedChat
+          };
+        });
+        dispatch(setChatsData(chatTabs));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUserChats();
+  }, [dispatch, token]);
 
   useEffect(() => {
     if (ref.current) {

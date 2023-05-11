@@ -4,7 +4,8 @@ import FormData from 'form-data';
 
 import { RegisterData } from '../types/register';
 import Field from '../components/Home/Field';
-
+import axios from 'axios';
+let ENDPOINT_SIGNUP = 'http://localhost:8080/signup';
 function Register() {
   const initialValues: RegisterData = {
     name: '',
@@ -42,11 +43,15 @@ function Register() {
     data.append('lastName', formData.lastName);
     data.append('email', formData.email);
     data.append('password', formData.password);
-    /* 
-      TODO: 
-      1. Make a new user
-      2. Display a sucess notification (or error).
-    */
+    axios
+      .post(ENDPOINT_SIGNUP, data)
+      .then((response) => {
+        console.log(response);
+        alert('usuario creado correctamente')
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (

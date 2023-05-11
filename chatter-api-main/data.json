@@ -73,5 +73,14 @@
     "password": "123",
     "image": "images\\9s1dcwslhghhm1h-profile-pic (2).png",
     "chats": []
+  },
+  {
+    "userId": "9s1d3mclhhwpdgs",
+    "name": "Josefina",
+    "lastName": "Alonso",
+    "email": "joseealonsoo01@gmail.com",
+    "password": "123",
+    "image": "images\\9s1d3mclhhwpdgn-profile-pic (2).png",
+    "chats": []
   }
 ]

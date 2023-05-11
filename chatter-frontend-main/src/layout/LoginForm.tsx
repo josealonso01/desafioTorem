@@ -3,7 +3,11 @@ import React, { useState } from 'react';
 import FormData from 'form-data';
 import Link from 'next/link';
 import { LoginData } from '../types/login';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setLoginData } from '../redux/userSlice';
 
+let ENDPOINT_LOGIN = 'http://localhost:8080/login';
 function LoginForm() {
   const initialValues: LoginData = {
     email: '',
@@ -18,20 +22,31 @@ function LoginForm() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const dispatch = useDispatch();
   const handleLogin = () => {
-    resetForm();
     data.append('email', formData.email);
     data.append('password', formData.password);
-    /* 
-      TODO: 
-      1. Check login
-      2. Handle errors (if there is at least one) 
-    */
+    resetForm();
+    axios
+      .post(ENDPOINT_LOGIN, data)
+      .then((response) => {
+        console.log(response.data.token);
+        console.log(response.data.userId);
+        dispatch(setLoginData({ authToken: response.data.token, userId: response.data.userId }));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
+  interface FormDataExtended extends FormData {
+    delete(name: string): void;
+  }
+  const dataextended = new FormData() as FormDataExtended;
+
   const resetForm = () => {
-    // data.delete('email');
-    // data.delete('password');
+    dataextended.delete('email');
+    dataextended.delete('password');
   };
 
   return (
@@ -56,9 +71,11 @@ function LoginForm() {
       />
 
       <div className="content d-flex flex-column mb-5 d-flex align-items-start" data-aos="fade">
-        <button type="submit" className="btn btn-primary" onClick={handleLogin}>
-          Ingresar
-        </button>
+        <Link href="/chat" passHref>
+          <button type="submit" className="btn btn-primary" onClick={handleLogin}>
+            Ingresar
+          </button>
+        </Link>
       </div>
 
       <div className="content text d-flex flex-row gap-2 mb-5 fs-6 fst-italic" data-aos="fade">
