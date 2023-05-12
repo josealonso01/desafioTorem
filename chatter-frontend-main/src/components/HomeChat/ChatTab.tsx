@@ -7,6 +7,11 @@ import { ChatTabProps } from '../../types/chat';
 import ConfirmDialog from '../ConfirmDialog';
 import ContextMenu from '../ContextMenu';
 import ChatTabContextMenu from './ChatTabContextMenu';
+import axios from 'axios';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { getUser, setUserData } from '../../redux/userSlice';
+
+let ENDPOINT_DELETE = 'http://localhost:8080/chats';
 
 const Container = styled.div<{ isSelected: boolean }>`
   display: flex;
@@ -104,11 +109,33 @@ function ChatTab(chatTabProps: ChatTabProps) {
     : 'No hay mensajes.';
   const lastMessageTime = messages[0] ? messages.slice(-1)[0].timeDate.slice(11, 16) + ' p.m.' : '';
 
-  const eraseChat = () => {
-    /* 
-      TODO: 
-      1. Delete chat
-    */
+  const userData = useAppSelector(getUser);
+
+  const token = userData.authToken;
+
+  const dispatch = useAppDispatch();
+
+  const eraseChat = async () => {
+    const authToken = token;
+    const chatId = chatTabProps.chatId;
+    try {
+      const response = await axios.delete(`${ENDPOINT_DELETE}/${chatId}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      dispatch(
+        setUserData({
+          name: response.data.name,
+          lastName: response.data.lastName,
+          email: response.data.email,
+          photo: response.data.photol,
+          userId: response.data.userId
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleOpenModal = () => {
