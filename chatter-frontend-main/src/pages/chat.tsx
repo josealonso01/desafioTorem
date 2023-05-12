@@ -16,8 +16,9 @@ import ChatTab from '../components/HomeChat/ChatTab';
 import ChatMessages from '../components/HomeChat/ChatMessages';
 import axios from 'axios';
 import { setChatsData } from '../redux/chatsSlice';
-
+import { io } from 'socket.io-client';
 let ENDPOINT_USER = 'http://localhost:8080/users';
+let ENDPOINT_SOCKET = 'http://localhost:8080';
 
 function HomeChat() {
   const chatHeaderInitialState: Chat = {
@@ -105,7 +106,20 @@ function HomeChat() {
 
       // Update scroll position
       positionRef.current.scrollIntoView();
-
+      const socket = io(ENDPOINT_SOCKET);
+      socket.on('connect', () => {
+        console.log('WebSocket connected!', socket.id);
+      });
+      socket.on('chats', (message) => {
+        console.log('chats', message);
+      });
+      socket.on('connect_error', (error) => {
+        console.error(error);
+      });
+      return () => {
+        socket.off('chats');
+        socket.disconnect();
+      };
       /*
         TODO: 
           1. Listen the socket
