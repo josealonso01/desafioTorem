@@ -30,8 +30,6 @@ function LoginForm() {
     axios
       .post(ENDPOINT_LOGIN, data)
       .then((response) => {
-        console.log(response.data.token);
-        console.log(response.data.userId);
         dispatch(setLoginData({ authToken: response.data.token, userId: response.data.userId }));
       })
       .catch((error) => {

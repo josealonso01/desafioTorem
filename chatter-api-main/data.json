@@ -35,6 +35,24 @@
             "message": "Noooooo",
             "timeDate": "2022-05-12T20:28:26.461Z",
             "received": false
+          },
+          {
+            "messageId": "9s1dhdwlhmelmtr",
+            "message": "hola",
+            "timeDate": "2023-05-13T19:52:05.582Z",
+            "received": false
+          },
+          {
+            "messageId": "9s1dhdwlhmes00v",
+            "message": "hola",
+            "timeDate": "2023-05-13T19:57:02.623Z",
+            "received": false
+          },
+          {
+            "messageId": "9s1dhdwlhmes3w7",
+            "message": "Este es un mensaje de prueba! Deberías de recibir este mensaje luego de 5 segundos de haber enviado uno.",
+            "timeDate": "2023-05-13T19:57:07.639Z",
+            "received": true
           }
         ]
       },

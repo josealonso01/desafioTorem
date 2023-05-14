@@ -118,6 +118,7 @@ function ChatTab(chatTabProps: ChatTabProps) {
   const eraseChat = async () => {
     const authToken = token;
     const chatId = chatTabProps.chatId;
+    
     try {
       const response = await axios.delete(`${ENDPOINT_DELETE}/${chatId}`, {
         headers: {

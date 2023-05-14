@@ -8,7 +8,7 @@ import MyProfile from '../components/MyProfile';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { getUser, setUserData } from '../redux/userSlice';
 import { Chat, ChatTabProps, LogoType } from '../types/chat';
-import { getChats, setIsAllowedExpand } from '../redux/chatsSlice';
+import { addMessage, getChats, setIsAllowedExpand } from '../redux/chatsSlice';
 import ChatHeader from '../components/HomeChat/ChatHeader';
 import ConfigDropdown from '../layout/Dropdowns/Config';
 import SearchBar from '../components/SearchBar';
@@ -17,8 +17,9 @@ import ChatMessages from '../components/HomeChat/ChatMessages';
 import axios from 'axios';
 import { setChatsData } from '../redux/chatsSlice';
 import { io } from 'socket.io-client';
-let ENDPOINT_USER = 'http://localhost:8080/users';
-let ENDPOINT_SOCKET = 'http://localhost:8080';
+const ENDPOINT_CHATS = 'http://localhost:8080/cnats';
+const ENDPOINT_USER = 'http://localhost:8080/users';
+const ENDPOINT_SOCKET = 'http://localhost:8080';
 
 function HomeChat() {
   const chatHeaderInitialState: Chat = {
@@ -79,7 +80,6 @@ function HomeChat() {
             Authorization: `Bearer ${authToken}`
           }
         });
-        console.log(response.data.chats);
 
         const chatTabs: ChatTabProps[] = response.data.chats.map((chat: any) => {
           return {
@@ -110,22 +110,9 @@ function HomeChat() {
       socket.on('connect', () => {
         console.log('WebSocket connected!', socket.id);
       });
-      socket.on('chats', (message) => {
-        console.log('chats', message);
+      socket.on('chats', (chats) => {
+        console.log('chats papa', chats);
       });
-      socket.on('connect_error', (error) => {
-        console.error(error);
-      });
-      return () => {
-        socket.off('chats');
-        socket.disconnect();
-      };
-      /*
-        TODO: 
-          1. Listen the socket
-          2. Get chat data
-          3. Set the socket off and return void to prevent useless renders
-      */
     }
   }, [chats]);
 
@@ -136,14 +123,21 @@ function HomeChat() {
   const handleSendMsg = () => {
     if (msgEntry !== '') {
       setMsgEntry('');
-      /*
-        TODO:
-        1. Send message
-      */
+      const socket = io(ENDPOINT_SOCKET);
+      dispatch(
+        addMessage({
+          chatId: selectedChat,
+          message: {
+            messageId: selectedChat,
+            message: msgEntry,
+            received: false,
+            timeDate: new Date().toString()
+          }
+        })
+      );
+      socket.emit('chats', chats);
     } else {
-      /* TODO: 
-        1. Show error notification
-      */
+      alert('no hay ningun mensaje para emitir');
     }
   };
 

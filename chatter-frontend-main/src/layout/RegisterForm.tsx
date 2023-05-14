@@ -46,7 +46,6 @@ function Register() {
     axios
       .post(ENDPOINT_SIGNUP, data)
       .then((response) => {
-        console.log(response);
         alert('usuario creado correctamente')
       })
       .catch((error) => {
